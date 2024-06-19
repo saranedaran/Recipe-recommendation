@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Recommendation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        h1 {
+            text-align: center;
+            color: black;
+            margin: 0;
+        }
+
+        #recipe-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        #recipe-form label {
+            margin-right: 10px;
+        }
+
+        #recipe-form input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px;
+            margin-right: 10px;
+        }
+
+        #recipe-form button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #recipe-form button:hover {
+            background-color: #218838;
+        }
+
+        #recommendations {
+            margin: 20px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none; /* Initially hidden */
+        }
+
+        #recommendations h3 {
+            margin-top: 0;
+        }
+
+        iframe {
+            display: none; /* Initially hidden */
+            margin: 20px auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipe Recommendation System</h1>
+    <form id="recipe-form">
+        <label for="ingredients">Enter ingredients (comma separated):</label>
+        <input type="text" id="ingredients" name="ingredients">
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    <div id="recommendations">
+        <h2>Recommendations:</h2>
+        <div id="recommendations-content"></div>
+    </div>
+    
+    <iframe id="recipe-video" width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+    <script>
+        document.getElementById('recipe-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const ingredients = document.getElementById('ingredients').value.split(',').map(ing => ing.trim());
+
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ingredients: ingredients })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const recommendationsDiv = document.getElementById('recommendations');
+                    const recommendationsContent = document.getElementById('recommendations-content');
+                    recommendationsContent.innerHTML = '';
+                    data.recommendations.forEach(recipe => {
+                        const recipeElement = document.createElement('div');
+                        recipeElement.innerHTML = `
+                            <h3>${recipe.TranslatedRecipeName}</h3>
+                            <p><strong>Ingredients:</strong> ${recipe.TranslatedIngredients}</p>
+                            <p><strong>Total Time:</strong> ${recipe.TotalTimeInMins} minutes</p>
+                            <p><strong>Cuisine:</strong> ${recipe.Cuisine}</p>
+                            <p><strong>Instructions:</strong> ${recipe.TranslatedInstructions}</p>
+                        `;
+                        recommendationsContent.appendChild(recipeElement);
+                    });
+                    recommendationsDiv.style.display = 'block';
+
+                    // Update the video iframe with the new video URL
+                    const videoUrl = data.video_url.replace("watch?v=", "embed/");
+                    const recipeVideo = document.getElementById('recipe-video');
+                    recipeVideo.src = videoUrl;
+                    recipeVideo.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

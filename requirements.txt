@@ -1,0 +1,5 @@
+Flask==3.0.3
+Pandas==2.2.2
+Scikit-Learn==1.4.1.post1
+NLTK==3.8.1
+google-api-python-client==2.133.0
