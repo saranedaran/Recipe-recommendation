@@ -43,7 +43,7 @@ def recommend_recipes(ingredients_list, top_n=1):
 
 # YouTube API function
 def get_youtube_video(query):
-    api_key = "AIzaSyAlNPSn3H_FWste4tsMVyxZmuSYGjxry0E"  # Replace with your actual YouTube API key
+    api_key = "YOUR_API_KEY"  # Replace with your actual YouTube API key
     youtube = build('youtube', 'v3', developerKey=api_key)
     request = youtube.search().list(q=query, part='snippet', type='video', maxResults=1)
     response = request.execute()
